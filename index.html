@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Messenger Auto System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #1877f2;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .form-container {
+            padding: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .input-group input,
+        .input-group textarea,
+        .input-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border 0.3s;
+        }
+        
+        .input-group input:focus,
+        .input-group textarea:focus,
+        .input-group select:focus {
+            border-color: #1877f2;
+            outline: none;
+        }
+        
+        .input-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .file-input {
+            padding: 10px;
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        
+        .file-input:hover {
+            border-color: #1877f2;
+        }
+        
+        .settings-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .btn {
+            background: #1877f2;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #166fe5;
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .status-box {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #1877f2;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e1e1e1;
+            border-radius: 4px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: #1877f2;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .logs {
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 13px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .log-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .log-item.success {
+            color: #28a745;
+        }
+        
+        .log-item.error {
+            color: #dc3545;
+        }
+        
+        .log-item.info {
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📨 Facebook Messenger System</h1>
+            <p>Token, User ID, और मैसेज फाइल से ऑटो मैसेज भेजें</p>
+        </div>
+        
+        <div class="form-container">
+            <div class="input-group">
+                <label for="token">Facebook Access Token</label>
+                <input type="password" id="token" placeholder="EAAB... डालें" autocomplete="off">
+            </div>
+            
+            <div class="input-group">
+                <label for="userId">Facebook User/Page ID</label>
+                <input type="text" id="userId" placeholder="10001234567890">
+            </div>
+            
+            <div class="input-group">
+                <label for="messageFile">मैसेज फाइल चुनें (.txt)</label>
+                <div class="file-input" onclick="document.getElementById('fileInput').click()">
+                    फाइल चुनने के लिए यहाँ क्लिक करें
+                    <input type="file" id="fileInput" accept=".txt" style="display: none;" 
+                           onchange="previewFile()">
+                </div>
+                <div id="fileName" style="margin-top: 10px; color: #666;"></div>
+            </div>
+            
+            <div class="input-group">
+                <label for="singleMessage">या सिंगल मैसेज डालें</label>
+                <textarea id="singleMessage" placeholder="यहाँ मैसेज लिखें..."></textarea>
+            </div>
+            
+            <div class="settings-row">
+                <div class="input-group">
+                    <label for="delay">डिले (सेकंड्स)</label>
+                    <input type="number" id="delay" value="5" min="1" max="60">
+                </div>
+                
+                <div class="input-group">
+                    <label for="sendMode">भेजने का तरीका</label>
+                    <select id="sendMode">
+                        <option value="file">फाइल से (लाइन बाय लाइन)</option>
+                        <option value="single">सिंगल मैसेज</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="startSending()" id="sendBtn">▶ मैसेज भेजना शुरू करें</button>
+            <button class="btn" onclick="stopSending()" id="stopBtn" style="background: #dc3545; margin-top: 10px; display: none;">⏹ रोकें</button>
+            
+            <div class="status-box">
+                <h3>🔧 स्टेटस</h3>
+                <div id="status">तैयार है...</div>
+                <div class="progress-bar">
+                    <div class="progress" id="progressBar"></div>
+                </div>
+                <div id="progressText">0/0 मैसेज भेजे गए</div>
+                
+                <h4 style="margin-top: 20px;">📋 लॉग्स:</h4>
+                <div class="logs" id="logs"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isSending = false;
+        let stopRequested = false;
+        let messages = [];
+        let currentIndex = 0;
+        
+        function previewFile() {
+            const fileInput = document.getElementById('fileInput');
+            const fileName = document.getElementById('fileName');
+            
+            if (fileInput.files.length > 0) {
+                fileName.innerHTML = `<strong>चुनी गई फाइल:</strong> ${fileInput.files[0].name}`;
+                readMessagesFromFile(fileInput.files[0]);
+            }
+        }
+        
+        function readMessagesFromFile(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const content = e.target.result;
+                messages = content.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 0);
+                
+                addLog(`✅ ${messages.length} मैसेज लोड किए गए`, 'success');
+            };
+            
+            reader.readAsText(file);
+        }
+        
+        function addLog(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const logItem = document.createElement('div');
+            logItem.className = `log-item ${type}`;
+            logItem.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            
+            logsDiv.appendChild(logItem);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+        
+        function updateProgress() {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            if (messages.length > 0) {
+                const percent = (currentIndex / messages.length) * 100;
+                progressBar.style.width = `${percent}%`;
+                progressText.textContent = `${currentIndex}/${messages.length} मैसेज भेजे गए`;
+            }
+        }
+        
+        async function sendMessage(recipientId, message, token) {
+            const url = `https://graph.facebook.com/v19.0/me/messages`;
+            
+            const payload = {
+                recipient: { id: recipientId },
+                message: { text: message },
+                messaging_type: "RESPONSE"
+            };
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    addLog(`✅ भेजा: "${message.substring(0, 30)}..."`, 'success');
+                    return { success: true, data: result };
+                } else {
+                    addLog(`❌ त्रुटि: ${result.error?.message || 'Unknown error'}`, 'error');
+                    return { success: false, error: result.error };
+                }
+            } catch (error) {
+                addLog(`❌ नेटवर्क त्रुटि: ${error.message}`, 'error');
+                return { success: false, error: error.message };
+            }
+        }
+        
+        async function startSending() {
+            if (isSending) return;
+            
+            const token = document.getElementById('token').value.trim();
+            const userId = document.getElementById('userId').value.trim();
+            const delay = parseInt(document.getElementById('delay').value);
+            const sendMode = document.getElementById('sendMode').value;
+            
+            if (!token) {
+                alert('कृपया Facebook Access Token डालें');
+                return;
+            }
+            
+            if (!userId) {
+                alert('कृपया User/Page ID डालें');
+                return;
+            }
+            
+            let messageList = [];
+            
+            if (sendMode === 'file') {
+                if (messages.length === 0) {
+                    alert('कृपया पहले मैसेज फाइल चुनें');
+                    return;
+                }
+                messageList = [...messages];
+            } else {
+                const singleMessage = document.getElementById('singleMessage').value.trim();
+                if (!singleMessage) {
+                    alert('कृपया मैसेज डालें');
+                    return;
+                }
+                messageList = [singleMessage];
+            }
+            
+            isSending = true;
+            stopRequested = false;
+            currentIndex = 0;
+            
+            document.getElementById('sendBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'block';
+            document.getElementById('status').textContent = 'मैसेज भेज रहा है...';
+            
+            addLog('🚀 मैसेज भेजना शुरू किया', 'info');
+            
+            for (let i = 0; i < messageList.length; i++) {
+                if (stopRequested) {
+                    addLog('⏸ उपयोगकर्ता द्वारा रोका गया', 'info');
+                    break;
+                }
+                
+                const message = messageList[i];
+                
+                // Status update
+                document.getElementById('status').textContent = 
+                    `भेज रहा है ${i + 1}/${messageList.length}: "${message.substring(0, 30)}..."`;
+                
+                // Send message
+                const result = await sendMessage(userId, message, token);
+                
+                currentIndex = i + 1;
+                updateProgress();
+                
+                // Delay between messages
+                if (i < messageList.length - 1 && !stopRequested) {
+                    addLog(`⏳ ${delay} सेकंड का डिले...`, 'info');
+                    await new Promise(resolve => setTimeout(resolve, delay * 1000));
+                }
+            }
+            
+            isSending = false;
+            document.getElementById('sendBtn').style.display = 'block';
+            document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('status').textContent = stopRequested ? 'रोक दिया गया' : 'पूरा हो गया!';
+            
+            if (!stopRequested) {
+                addLog('🎉 सभी मैसेज सफलतापूर्वक भेजे गए!', 'success');
+            }
+        }
+        
+        function stopSending() {
+            stopRequested = true;
+            addLog('⏸ रोकने का अनुरोध किया गया...', 'info');
+        }
+        
+        // Auto switch between file and single message
+        document.getElementById('sendMode').addEventListener('change', function(e) {
+            if (e.target.value === 'file') {
+                document.getElementById('singleMessage').style.opacity = '0.5';
+                document.getElementById('singleMessage').disabled = true;
+            } else {
+                document.getElementById('singleMessage').style.opacity = '1';
+                document.getElementById('singleMessage').disabled = false;
+            }
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('सिस्टम तैयार है', 'info');
+        });
+    </script>
+</body>
+</html>
