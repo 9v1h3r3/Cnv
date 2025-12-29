@@ -3,430 +3,1668 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Facebook Messenger Auto System</title>
+    <meta name="description" content="Facebook Messenger Auto Sending System with Token and File Support">
+    <meta name="keywords" content="Facebook, Messenger, Auto Message, Bulk Message, Token">
+    <title>Facebook Messenger Auto System - Render Deployment</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACSSURBVHgB7ZPRDcAgCEQPKXaU7iEdpCP8kI7QEboJN8mNkgSCAgU/+Lz0GnKHIHQyACZgBdJMWUoX4MGtYcZfQN2YpA+EmnQiQwQ8I5y6uDMWJvKMPHw9UGrA/bH0R9EfQWlFdLw2UF1b1yLNHHX7FmIfLvkHFi2BmY1TceD5cDOi6R5wP9hNRhXeMAAAAABJRU5ErkJggg==">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    
     <style>
+        /* Reset and Base Styles */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
+        :root {
+            --primary: #1877f2;
+            --primary-dark: #166fe5;
+            --secondary: #42b72a;
+            --secondary-dark: #36a420;
+            --danger: #dc3545;
+            --danger-dark: #c82333;
+            --warning: #ffc107;
+            --warning-dark: #e0a800;
+            --info: #17a2b8;
+            --info-dark: #138496;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --gray-dark: #495057;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --transition: all 0.3s ease;
+        }
+
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-attachment: fixed;
             min-height: 100vh;
             padding: 20px;
+            line-height: 1.6;
+            color: var(--dark);
         }
-        
+
+        /* Container */
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
         }
-        
-        .header {
-            background: #1877f2;
+
+        @media (max-width: 992px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card Styling */
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            padding: 25px;
+            padding: 25px 30px;
             text-align: center;
         }
-        
-        .header h1 {
-            font-size: 28px;
+
+        .card-header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
             margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
         }
-        
-        .header p {
+
+        .card-header p {
             opacity: 0.9;
-            font-size: 14px;
+            font-size: 0.95rem;
+            max-width: 80%;
+            margin: 0 auto;
         }
-        
-        .form-container {
+
+        .card-body {
             padding: 30px;
         }
-        
-        .input-group {
+
+        /* Form Elements */
+        .form-group {
             margin-bottom: 25px;
         }
-        
-        .input-group label {
+
+        .form-group label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-            font-size: 14px;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 0.95rem;
+            font-family: 'Poppins', sans-serif;
         }
-        
-        .input-group input,
-        .input-group textarea,
-        .input-group select {
+
+        .form-group label i {
+            margin-right: 8px;
+            color: var(--primary);
+        }
+
+        .form-control {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e1e1e1;
-            border-radius: 8px;
+            padding: 14px 16px;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--border-radius-sm);
             font-size: 15px;
-            transition: border 0.3s;
+            font-family: 'Roboto', sans-serif;
+            transition: var(--transition);
+            background: white;
         }
-        
-        .input-group input:focus,
-        .input-group textarea:focus,
-        .input-group select:focus {
-            border-color: #1877f2;
+
+        .form-control:focus {
+            border-color: var(--primary);
             outline: none;
+            box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.1);
         }
-        
-        .input-group textarea {
+
+        .form-control::placeholder {
+            color: var(--gray);
+        }
+
+        textarea.form-control {
             min-height: 120px;
             resize: vertical;
+            line-height: 1.5;
         }
-        
-        .file-input {
-            padding: 10px;
-            background: #f8f9fa;
-            border: 2px dashed #dee2e6;
+
+        /* File Upload */
+        .file-upload {
+            position: relative;
+            border: 2px dashed var(--gray-light);
+            border-radius: var(--border-radius-sm);
+            padding: 30px 20px;
             text-align: center;
+            background: var(--light);
             cursor: pointer;
-            border-radius: 8px;
+            transition: var(--transition);
         }
-        
-        .file-input:hover {
-            border-color: #1877f2;
+
+        .file-upload:hover {
+            border-color: var(--primary);
+            background: rgba(24, 119, 242, 0.05);
         }
-        
+
+        .file-upload i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .file-upload .file-text {
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .file-upload .file-hint {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        #fileInput {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* Settings Row */
         .settings-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
             margin-bottom: 25px;
         }
-        
+
+        @media (max-width: 576px) {
+            .settings-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+
+        /* Buttons */
         .btn {
-            background: #1877f2;
-            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px 30px;
             border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
+            border-radius: var(--border-radius-sm);
             font-size: 16px;
             font-weight: 600;
+            font-family: 'Poppins', sans-serif;
             cursor: pointer;
+            transition: var(--transition);
             width: 100%;
-            transition: background 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        
-        .btn:hover {
-            background: #166fe5;
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
         }
-        
+
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(24, 119, 242, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), var(--danger-dark));
+            color: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: linear-gradient(135deg, var(--danger-dark), var(--danger));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-dark));
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: linear-gradient(135deg, var(--secondary-dark), var(--secondary));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(66, 183, 42, 0.3);
+        }
+
         .btn:disabled {
-            background: #ccc;
+            opacity: 0.6;
             cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
         }
-        
-        .status-box {
-            margin-top: 25px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #1877f2;
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
         }
-        
+
+        /* Progress Bar */
+        .progress-container {
+            margin: 25px 0;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .progress-label {
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .progress-percent {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
         .progress-bar {
-            height: 8px;
-            background: #e1e1e1;
-            border-radius: 4px;
-            margin: 15px 0;
+            height: 10px;
+            background: var(--gray-light);
+            border-radius: 5px;
             overflow: hidden;
         }
-        
-        .progress {
+
+        .progress-fill {
             height: 100%;
-            background: #1877f2;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 5px;
             width: 0%;
-            transition: width 0.3s;
+            transition: width 0.5s ease;
+            position: relative;
+            overflow: hidden;
         }
-        
-        .logs {
-            max-height: 200px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 13px;
-            background: #f8f9fa;
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background-image: linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.15) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255, 255, 255, 0.15) 50%,
+                rgba(255, 255, 255, 0.15) 75%,
+                transparent 75%,
+                transparent
+            );
+            background-size: 1rem 1rem;
+            animation: progressStripes 1s linear infinite;
+        }
+
+        @keyframes progressStripes {
+            0% { background-position: 1rem 0; }
+            100% { background-position: 0 0; }
+        }
+
+        /* Status Box */
+        .status-box {
+            background: var(--light);
+            border-radius: var(--border-radius-sm);
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .status-header i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .status-text {
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
             padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
+            background: white;
+            border-radius: var(--border-radius-sm);
+            box-shadow: var(--shadow);
         }
-        
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Logs Container */
+        .logs-container {
+            background: var(--dark);
+            border-radius: var(--border-radius-sm);
+            padding: 20px;
+            margin-top: 25px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .logs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .logs-header h4 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+        }
+
+        .clear-logs {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .clear-logs:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .logs-content {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
         .log-item {
-            padding: 5px 0;
-            border-bottom: 1px solid #eee;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #ddd;
+            border-left: 3px solid var(--gray);
+            word-break: break-word;
         }
-        
-        .log-item.success {
-            color: #28a745;
-        }
-        
-        .log-item.error {
-            color: #dc3545;
-        }
-        
+
         .log-item.info {
-            color: #007bff;
+            border-left-color: var(--info);
+        }
+
+        .log-item.success {
+            border-left-color: var(--secondary);
+            background: rgba(66, 183, 42, 0.1);
+        }
+
+        .log-item.warning {
+            border-left-color: var(--warning);
+            background: rgba(255, 193, 7, 0.1);
+        }
+
+        .log-item.error {
+            border-left-color: var(--danger);
+            background: rgba(220, 53, 69, 0.1);
+        }
+
+        .log-time {
+            color: var(--gray);
+            font-size: 0.8rem;
+            margin-right: 10px;
+        }
+
+        /* Token Verification */
+        .token-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+
+        .token-status.valid {
+            background: rgba(66, 183, 42, 0.1);
+            color: var(--secondary);
+        }
+
+        .token-status.invalid {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+        }
+
+        .token-status.checking {
+            background: rgba(255, 193, 7, 0.1);
+            color: var(--warning);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--gray-light);
+            margin-bottom: 25px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            color: var(--gray);
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .tab:hover {
+            color: var(--primary);
+        }
+
+        .tab.active {
+            color: var(--primary);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        /* Instructions */
+        .instructions {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: var(--border-radius-sm);
+            margin-top: 30px;
+        }
+
+        .instructions h4 {
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .instructions ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .instructions li {
+            margin-bottom: 10px;
+            padding-left: 24px;
+            position: relative;
+        }
+
+        .instructions li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .mb-20 { margin-bottom: 20px; }
+        .mt-20 { margin-top: 20px; }
+        .d-none { display: none; }
+        .d-flex { display: flex; }
+        .align-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .w-100 { width: 100%; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .card-header h2 {
+                font-size: 1.5rem;
+            }
+            
+            .card-body {
+                padding: 20px;
+            }
+            
+            .settings-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --light: #2d3748;
+                --dark: #f7fafc;
+                --gray-light: #4a5568;
+                --gray: #a0aec0;
+            }
+            
+            .card {
+                background: rgba(45, 55, 72, 0.95);
+                color: var(--dark);
+            }
+            
+            .form-control {
+                background: #4a5568;
+                border-color: #718096;
+                color: white;
+            }
+            
+            .form-control::placeholder {
+                color: #a0aec0;
+            }
+            
+            .file-upload {
+                background: #4a5568;
+                border-color: #718096;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>📨 Facebook Messenger System</h1>
-            <p>Token, User ID, और मैसेज फाइल से ऑटो मैसेज भेजें</p>
+        <!-- Left Column: Input Form -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-cogs"></i> Messenger Configuration</h2>
+                <p>Configure your Facebook token, user ID, and message settings</p>
+            </div>
+            <div class="card-body">
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('basic')" id="tab-basic">
+                        <i class="fas fa-sliders-h"></i> Basic Settings
+                    </button>
+                    <button class="tab" onclick="switchTab('advanced')" id="tab-advanced">
+                        <i class="fas fa-code"></i> Advanced Settings
+                    </button>
+                </div>
+
+                <!-- Basic Settings Tab -->
+                <div id="basic-settings">
+                    <div class="form-group">
+                        <label for="token">
+                            <i class="fas fa-key"></i> Facebook Access Token
+                            <span id="tokenStatus" class="token-status d-none">
+                                <i class="fas fa-circle"></i> <span class="status-text">Checking...</span>
+                            </span>
+                        </label>
+                        <div class="d-flex">
+                            <input type="password" id="token" class="form-control" 
+                                   placeholder="Enter EAAB... token here"
+                                   oninput="debouncedVerifyToken()">
+                            <button class="btn btn-primary" onclick="toggleTokenVisibility()" 
+                                    style="width: auto; margin-left: 10px; padding: 0 15px;">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="text-right mt-10">
+                            <small>
+                                <a href="https://developers.facebook.com/tools/explorer/" target="_blank" 
+                                   style="color: var(--primary); text-decoration: none;">
+                                    <i class="fas fa-external-link-alt"></i> Get Token from Facebook
+                                </a>
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="userId"><i class="fas fa-user"></i> Facebook User/Page ID</label>
+                        <input type="text" id="userId" class="form-control" 
+                               placeholder="Enter Facebook ID (e.g., 10001234567890)">
+                        <div class="text-right mt-10">
+                            <small>
+                                <a href="javascript:void(0)" onclick="findUserId()" 
+                                   style="color: var(--primary); text-decoration: none;">
+                                    <i class="fas fa-search"></i> Find my User ID
+                                </a>
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-comment-alt"></i> Message Source</label>
+                        <div class="settings-row">
+                            <select id="sendMode" class="form-control" onchange="toggleMessageSource()">
+                                <option value="file">Upload Message File (.txt)</option>
+                                <option value="single">Single Message</option>
+                                <option value="batch">Batch Messages (Multiple)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="fileUploadSection">
+                        <div class="form-group">
+                            <label><i class="fas fa-file-upload"></i> Upload Message File</label>
+                            <div class="file-upload">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <div class="file-text" id="fileName">Click to upload messages.txt file</div>
+                                <div class="file-hint">One message per line. Max 1000 messages.</div>
+                                <input type="file" id="fileInput" accept=".txt">
+                            </div>
+                            <div id="fileStats" class="text-center mt-10" style="display: none;">
+                                <span id="messageCount" class="stat-value">0</span> messages loaded
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="singleMessageSection" style="display: none;">
+                        <div class="form-group">
+                            <label for="singleMessage"><i class="fas fa-edit"></i> Single Message</label>
+                            <textarea id="singleMessage" class="form-control" 
+                                      placeholder="Type your message here..."></textarea>
+                        </div>
+                    </div>
+
+                    <div id="batchMessageSection" style="display: none;">
+                        <div class="form-group">
+                            <label><i class="fas fa-list-ol"></i> Batch Messages</label>
+                            <textarea id="batchMessages" class="form-control" 
+                                      placeholder="Enter each message on a new line..."></textarea>
+                            <div class="text-right mt-10">
+                                <small id="batchCount">0 messages</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-row">
+                        <div class="form-group">
+                            <label for="delay"><i class="fas fa-clock"></i> Delay Between Messages (seconds)</label>
+                            <input type="number" id="delay" class="form-control" value="5" min="1" max="60">
+                            <small class="text-gray">Prevents rate limiting</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="retryCount"><i class="fas fa-redo"></i> Retry Attempts</label>
+                            <input type="number" id="retryCount" class="form-control" value="3" min="0" max="10">
+                            <small class="text-gray">Failed message retries</small>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn btn-success" onclick="verifyToken()" id="verifyBtn">
+                            <i class="fas fa-check-circle"></i> Verify Token
+                        </button>
+                        <button class="btn btn-primary" onclick="startSending()" id="sendBtn">
+                            <i class="fas fa-paper-plane"></i> Start Sending
+                        </button>
+                    </div>
+
+                    <div class="button-group" id="controlButtons" style="display: none;">
+                        <button class="btn btn-danger" onclick="stopSending()" id="stopBtn">
+                            <i class="fas fa-stop-circle"></i> Stop Sending
+                        </button>
+                        <button class="btn btn-warning" onclick="pauseSending()" id="pauseBtn">
+                            <i class="fas fa-pause-circle"></i> Pause
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Advanced Settings Tab -->
+                <div id="advanced-settings" style="display: none;">
+                    <div class="form-group">
+                        <label><i class="fas fa-server"></i> API Configuration</label>
+                        <div class="settings-row">
+                            <input type="text" id="apiBase" class="form-control" 
+                                   value="https://your-render-app.onrender.com/api" 
+                                   placeholder="API Base URL">
+                            <input type="text" id="apiVersion" class="form-control" 
+                                   value="v19.0" placeholder="Facebook API Version">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-shield-alt"></i> Security Settings</label>
+                        <div class="settings-row">
+                            <select id="encryption" class="form-control">
+                                <option value="none">No Encryption</option>
+                                <option value="aes">AES Encryption</option>
+                            </select>
+                            <select id="logLevel" class="form-control">
+                                <option value="debug">Debug</option>
+                                <option value="info" selected>Info</option>
+                                <option value="warning">Warning</option>
+                                <option value="error">Error</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-tasks"></i> Performance</label>
+                        <div class="settings-row">
+                            <input type="number" id="batchSize" class="form-control" 
+                                   value="10" min="1" max="100" placeholder="Batch Size">
+                            <input type="number" id="timeout" class="form-control" 
+                                   value="30" min="5" max="120" placeholder="Timeout (seconds)">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-database"></i> Data Management</label>
+                        <div class="buttons">
+                            <button class="btn btn-info" onclick="exportData()">
+                                <i class="fas fa-download"></i> Export Settings
+                            </button>
+                            <button class="btn btn-info" onclick="importData()">
+                                <i class="fas fa-upload"></i> Import Settings
+                            </button>
+                            <button class="btn btn-danger" onclick="clearAllData()">
+                                <i class="fas fa-trash"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="instructions">
+                        <h4><i class="fas fa-info-circle"></i> Advanced Features</h4>
+                        <ul>
+                            <li>Custom API endpoints for different Facebook versions</li>
+                            <li>Encryption for secure token storage</li>
+                            <li>Batch processing for better performance</li>
+                            <li>Export/Import configuration settings</li>
+                            <li>Detailed logging levels for debugging</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div class="form-container">
-            <div class="input-group">
-                <label for="token">Facebook Access Token</label>
-                <input type="password" id="token" placeholder="EAAB... डालें" autocomplete="off">
+
+        <!-- Right Column: Status & Logs -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-chart-line"></i> Sending Status & Logs</h2>
+                <p>Monitor message sending progress in real-time</p>
             </div>
-            
-            <div class="input-group">
-                <label for="userId">Facebook User/Page ID</label>
-                <input type="text" id="userId" placeholder="10001234567890">
-            </div>
-            
-            <div class="input-group">
-                <label for="messageFile">मैसेज फाइल चुनें (.txt)</label>
-                <div class="file-input" onclick="document.getElementById('fileInput').click()">
-                    फाइल चुनने के लिए यहाँ क्लिक करें
-                    <input type="file" id="fileInput" accept=".txt" style="display: none;" 
-                           onchange="previewFile()">
+            <div class="card-body">
+                <!-- Status Section -->
+                <div class="status-box">
+                    <div class="status-header">
+                        <i class="fas fa-sync-alt fa-spin" id="statusIcon"></i>
+                        <div class="status-text" id="statusText">Ready to send messages</div>
+                    </div>
+                    
+                    <!-- Progress Bar -->
+                    <div class="progress-container">
+                        <div class="progress-header">
+                            <div class="progress-label">Sending Progress</div>
+                            <div class="progress-percent" id="progressPercent">0%</div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="text-center mt-10" id="progressDetails">
+                            <span id="sentCount">0</span> of <span id="totalCount">0</span> messages sent
+                        </div>
+                    </div>
+
+                    <!-- Statistics -->
+                    <div class="stats" id="statsContainer">
+                        <div class="stat-item">
+                            <div class="stat-value" id="statSent">0</div>
+                            <div class="stat-label">Sent</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="statFailed">0</div>
+                            <div class="stat-label">Failed</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="statRemaining">0</div>
+                            <div class="stat-label">Remaining</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="statSuccessRate">100%</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                    </div>
                 </div>
-                <div id="fileName" style="margin-top: 10px; color: #666;"></div>
-            </div>
-            
-            <div class="input-group">
-                <label for="singleMessage">या सिंगल मैसेज डालें</label>
-                <textarea id="singleMessage" placeholder="यहाँ मैसेज लिखें..."></textarea>
-            </div>
-            
-            <div class="settings-row">
-                <div class="input-group">
-                    <label for="delay">डिले (सेकंड्स)</label>
-                    <input type="number" id="delay" value="5" min="1" max="60">
+
+                <!-- Logs Section -->
+                <div class="logs-container">
+                    <div class="logs-header">
+                        <h4><i class="fas fa-terminal"></i> System Logs</h4>
+                        <button class="clear-logs" onclick="clearLogs()">
+                            <i class="fas fa-trash"></i> Clear
+                        </button>
+                    </div>
+                    <div class="logs-content" id="logsContent">
+                        <!-- Logs will be added here dynamically -->
+                    </div>
                 </div>
-                
-                <div class="input-group">
-                    <label for="sendMode">भेजने का तरीका</label>
-                    <select id="sendMode">
-                        <option value="file">फाइल से (लाइन बाय लाइन)</option>
-                        <option value="single">सिंगल मैसेज</option>
-                    </select>
+
+                <!-- Instructions -->
+                <div class="instructions mt-20">
+                    <h4><i class="fas fa-lightbulb"></i> Quick Tips</h4>
+                    <ul>
+                        <li>Use delay of 5-10 seconds to avoid rate limiting</li>
+                        <li>Keep messages under 2000 characters</li>
+                        <li>Test with 1-2 messages first before bulk sending</li>
+                        <li>Save your token securely - never share it publicly</li>
+                        <li>Monitor logs for any errors or warnings</li>
+                    </ul>
                 </div>
-            </div>
-            
-            <button class="btn" onclick="startSending()" id="sendBtn">▶ मैसेज भेजना शुरू करें</button>
-            <button class="btn" onclick="stopSending()" id="stopBtn" style="background: #dc3545; margin-top: 10px; display: none;">⏹ रोकें</button>
-            
-            <div class="status-box">
-                <h3>🔧 स्टेटस</h3>
-                <div id="status">तैयार है...</div>
-                <div class="progress-bar">
-                    <div class="progress" id="progressBar"></div>
+
+                <!-- Server Status -->
+                <div class="status-box mt-20">
+                    <div class="d-flex align-center justify-between">
+                        <div>
+                            <i class="fas fa-server"></i>
+                            <span>Server Status:</span>
+                            <span id="serverStatus" class="token-status valid">
+                                <i class="fas fa-circle"></i> <span class="status-text">Online</span>
+                            </span>
+                        </div>
+                        <button class="btn btn-primary" onclick="checkServerHealth()" style="width: auto;">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
                 </div>
-                <div id="progressText">0/0 मैसेज भेजे गए</div>
-                
-                <h4 style="margin-top: 20px;">📋 लॉग्स:</h4>
-                <div class="logs" id="logs"></div>
             </div>
         </div>
     </div>
 
+    <!-- Footer -->
+    <div class="footer">
+        <p>
+            <i class="fas fa-code"></i> Facebook Messenger Auto System v2.0 | 
+            Deployed on <strong>Render</strong> | 
+            <a href="javascript:void(0)" onclick="showAbout()">About</a> | 
+            <a href="javascript:void(0)" onclick="showHelp()">Help</a> | 
+            <a href="javascript:void(0)" onclick="showPrivacy()">Privacy</a>
+        </p>
+        <p>
+            <small>
+                This tool is for legitimate messaging purposes only. 
+                Always comply with Facebook's Terms of Service.
+            </small>
+        </p>
+    </div>
+
+    <!-- Hidden Inputs -->
+    <input type="file" id="importFile" style="display: none;" accept=".json">
+    
     <script>
+        // Global Variables
         let isSending = false;
+        let isPaused = false;
         let stopRequested = false;
+        let currentJobId = null;
         let messages = [];
         let currentIndex = 0;
+        let sentCount = 0;
+        let failedCount = 0;
+        let jobInterval = null;
         
-        function previewFile() {
-            const fileInput = document.getElementById('fileInput');
-            const fileName = document.getElementById('fileName');
+        // API Configuration
+        const API_BASE = window.location.origin + '/api';
+        const DEBOUNCE_DELAY = 1000;
+        
+        // Utility Functions
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+        
+        // DOM Ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved settings
+            loadSettings();
             
-            if (fileInput.files.length > 0) {
-                fileName.innerHTML = `<strong>चुनी गई फाइल:</strong> ${fileInput.files[0].name}`;
-                readMessagesFromFile(fileInput.files[0]);
+            // Initialize
+            updateStats();
+            checkServerHealth();
+            addLog('System initialized and ready', 'info');
+            
+            // Set up event listeners
+            document.getElementById('singleMessage').addEventListener('input', updateSingleMessageStats);
+            document.getElementById('batchMessages').addEventListener('input', updateBatchMessageStats);
+            document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+            
+            // Auto-save settings
+            setInterval(saveSettings, 30000);
+        });
+        
+        // Tab Switching
+        function switchTab(tabName) {
+            // Update tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            if (tabName === 'basic') {
+                document.getElementById('tab-basic').classList.add('active');
+                document.getElementById('basic-settings').style.display = 'block';
+                document.getElementById('advanced-settings').style.display = 'none';
+            } else {
+                document.getElementById('tab-advanced').classList.add('active');
+                document.getElementById('basic-settings').style.display = 'none';
+                document.getElementById('advanced-settings').style.display = 'block';
             }
         }
         
-        function readMessagesFromFile(file) {
-            const reader = new FileReader();
+        // Message Source Toggle
+        function toggleMessageSource() {
+            const mode = document.getElementById('sendMode').value;
             
+            document.getElementById('fileUploadSection').style.display = 'none';
+            document.getElementById('singleMessageSection').style.display = 'none';
+            document.getElementById('batchMessageSection').style.display = 'none';
+            
+            if (mode === 'file') {
+                document.getElementById('fileUploadSection').style.display = 'block';
+            } else if (mode === 'single') {
+                document.getElementById('singleMessageSection').style.display = 'block';
+            } else if (mode === 'batch') {
+                document.getElementById('batchMessageSection').style.display = 'block';
+            }
+        }
+        
+        // File Handling
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
             reader.onload = function(e) {
                 const content = e.target.result;
                 messages = content.split('\n')
                     .map(line => line.trim())
-                    .filter(line => line.length > 0);
+                    .filter(line => line.length > 0 && !line.startsWith('//') && !line.startsWith('#'))
+                    .slice(0, 1000); // Limit to 1000 messages
                 
-                addLog(`✅ ${messages.length} मैसेज लोड किए गए`, 'success');
+                // Update UI
+                document.getElementById('fileName').textContent = `${file.name} (${messages.length} messages)`;
+                document.getElementById('fileStats').style.display = 'block';
+                document.getElementById('messageCount').textContent = messages.length;
+                
+                addLog(`Loaded ${messages.length} messages from ${file.name}`, 'success');
+                updateStats();
             };
             
             reader.readAsText(file);
         }
         
-        function addLog(message, type = 'info') {
-            const logsDiv = document.getElementById('logs');
-            const logItem = document.createElement('div');
-            logItem.className = `log-item ${type}`;
-            logItem.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+        // Token Visibility Toggle
+        function toggleTokenVisibility() {
+            const tokenInput = document.getElementById('token');
+            const button = event.currentTarget;
             
-            logsDiv.appendChild(logItem);
-            logsDiv.scrollTop = logsDiv.scrollHeight;
-        }
-        
-        function updateProgress() {
-            const progressBar = document.getElementById('progressBar');
-            const progressText = document.getElementById('progressText');
-            
-            if (messages.length > 0) {
-                const percent = (currentIndex / messages.length) * 100;
-                progressBar.style.width = `${percent}%`;
-                progressText.textContent = `${currentIndex}/${messages.length} मैसेज भेजे गए`;
+            if (tokenInput.type === 'password') {
+                tokenInput.type = 'text';
+                button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            } else {
+                tokenInput.type = 'password';
+                button.innerHTML = '<i class="fas fa-eye"></i>';
             }
         }
         
-        async function sendMessage(recipientId, message, token) {
-            const url = `https://graph.facebook.com/v19.0/me/messages`;
+        // Token Verification
+        const debouncedVerifyToken = debounce(verifyToken, DEBOUNCE_DELAY);
+        
+        async function verifyToken() {
+            const token = document.getElementById('token').value.trim();
+            if (!token) return;
             
-            const payload = {
-                recipient: { id: recipientId },
-                message: { text: message },
-                messaging_type: "RESPONSE"
-            };
+            const tokenStatus = document.getElementById('tokenStatus');
+            tokenStatus.className = 'token-status checking';
+            tokenStatus.querySelector('.status-text').textContent = 'Checking...';
+            tokenStatus.style.display = 'inline-flex';
             
             try {
-                const response = await fetch(url, {
+                const response = await fetch(`${API_BASE}/verify`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload)
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token })
                 });
                 
                 const result = await response.json();
                 
-                if (response.ok) {
-                    addLog(`✅ भेजा: "${message.substring(0, 30)}..."`, 'success');
-                    return { success: true, data: result };
+                if (result.valid) {
+                    tokenStatus.className = 'token-status valid';
+                    tokenStatus.querySelector('.status-text').textContent = 
+                        `Valid (Expires: ${new Date(result.expires_at * 1000).toLocaleDateString()})`;
+                    addLog('Token verified successfully', 'success');
                 } else {
-                    addLog(`❌ त्रुटि: ${result.error?.message || 'Unknown error'}`, 'error');
-                    return { success: false, error: result.error };
+                    tokenStatus.className = 'token-status invalid';
+                    tokenStatus.querySelector('.status-text').textContent = 'Invalid Token';
+                    addLog('Token verification failed', 'error');
                 }
             } catch (error) {
-                addLog(`❌ नेटवर्क त्रुटि: ${error.message}`, 'error');
-                return { success: false, error: error.message };
+                tokenStatus.className = 'token-status invalid';
+                tokenStatus.querySelector('.status-text').textContent = 'Verification Failed';
+                addLog(`Token verification error: ${error.message}`, 'error');
             }
         }
         
+        // Find User ID
+        async function findUserId() {
+            const token = document.getElementById('token').value.trim();
+            if (!token) {
+                alert('Please enter your Facebook token first');
+                return;
+            }
+            
+            try {
+                addLog('Fetching user information...', 'info');
+                
+                const response = await fetch(`https://graph.facebook.com/v19.0/me?access_token=${token}`);
+                const result = await response.json();
+                
+                if (result.id) {
+                    document.getElementById('userId').value = result.id;
+                    addLog(`Found User ID: ${result.id} (Name: ${result.name})`, 'success');
+                } else {
+                    addLog('Could not find User ID. Please check your token.', 'error');
+                }
+            } catch (error) {
+                addLog(`Error finding User ID: ${error.message}`, 'error');
+            }
+        }
+        
+        // Start Sending Messages
         async function startSending() {
             if (isSending) return;
             
+            // Get inputs
             const token = document.getElementById('token').value.trim();
             const userId = document.getElementById('userId').value.trim();
-            const delay = parseInt(document.getElementById('delay').value);
-            const sendMode = document.getElementById('sendMode').value;
+            const delay = parseInt(document.getElementById('delay').value) * 1000; // Convert to ms
+            const retryCount = parseInt(document.getElementById('retryCount').value);
+            const mode = document.getElementById('sendMode').value;
             
+            // Validation
             if (!token) {
-                alert('कृपया Facebook Access Token डालें');
+                alert('Please enter Facebook Access Token');
                 return;
             }
             
             if (!userId) {
-                alert('कृपया User/Page ID डालें');
+                alert('Please enter User/Page ID');
                 return;
             }
             
+            // Get messages based on mode
             let messageList = [];
             
-            if (sendMode === 'file') {
+            if (mode === 'file') {
                 if (messages.length === 0) {
-                    alert('कृपया पहले मैसेज फाइल चुनें');
+                    alert('Please upload a message file first');
                     return;
                 }
                 messageList = [...messages];
-            } else {
+            } else if (mode === 'single') {
                 const singleMessage = document.getElementById('singleMessage').value.trim();
                 if (!singleMessage) {
-                    alert('कृपया मैसेज डालें');
+                    alert('Please enter a message');
                     return;
                 }
                 messageList = [singleMessage];
+            } else if (mode === 'batch') {
+                const batchMessages = document.getElementById('batchMessages').value;
+                messageList = batchMessages.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 0);
+                
+                if (messageList.length === 0) {
+                    alert('Please enter batch messages');
+                    return;
+                }
             }
             
+            // Reset state
             isSending = true;
+            isPaused = false;
             stopRequested = false;
             currentIndex = 0;
+            sentCount = 0;
+            failedCount = 0;
             
-            document.getElementById('sendBtn').style.display = 'none';
-            document.getElementById('stopBtn').style.display = 'block';
-            document.getElementById('status').textContent = 'मैसेज भेज रहा है...';
+            // Update UI
+            document.getElementById('sendBtn').disabled = true;
+            document.getElementById('controlButtons').style.display = 'grid';
+            document.getElementById('statusText').textContent = 'Starting message sending...';
+            document.getElementById('statusIcon').className = 'fas fa-sync-alt fa-spin';
             
-            addLog('🚀 मैसेज भेजना शुरू किया', 'info');
+            // Update progress
+            updateProgress();
+            updateStats();
             
+            addLog(`Starting to send ${messageList.length} messages`, 'info');
+            addLog(`Delay: ${delay/1000}s, Retries: ${retryCount}`, 'info');
+            
+            // Start sending process
+            sendMessagesSequentially(token, userId, messageList, delay, retryCount);
+        }
+        
+        // Sequential Message Sending
+        async function sendMessagesSequentially(token, userId, messageList, delay, retryCount) {
             for (let i = 0; i < messageList.length; i++) {
                 if (stopRequested) {
-                    addLog('⏸ उपयोगकर्ता द्वारा रोका गया', 'info');
+                    addLog('Sending stopped by user', 'warning');
                     break;
                 }
                 
-                const message = messageList[i];
+                // Check if paused
+                while (isPaused && !stopRequested) {
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
                 
-                // Status update
-                document.getElementById('status').textContent = 
-                    `भेज रहा है ${i + 1}/${messageList.length}: "${message.substring(0, 30)}..."`;
+                if (stopRequested) break;
                 
-                // Send message
-                const result = await sendMessage(userId, message, token);
+                // Update current index
+                currentIndex = i;
                 
-                currentIndex = i + 1;
+                // Send message with retry
+                let success = false;
+                let attempts = 0;
+                
+                while (!success && attempts <= retryCount && !stopRequested) {
+                    attempts++;
+                    
+                    const message = messageList[i];
+                    const truncatedMsg = message.length > 50 ? message.substring(0, 50) + '...' : message;
+                    
+                    document.getElementById('statusText').textContent = 
+                        `Sending ${i + 1}/${messageList.length}: ${truncatedMsg}`;
+                    
+                    if (attempts > 1) {
+                        addLog(`Retry ${attempts}/${retryCount} for message ${i + 1}`, 'warning');
+                    }
+                    
+                    try {
+                        const response = await fetch(`${API_BASE}/send`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                token: token,
+                                user_id: userId,
+                                message: message
+                            })
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            success = true;
+                            sentCount++;
+                            addLog(`✓ Sent message ${i + 1}: ${truncatedMsg}`, 'success');
+                        } else {
+                            addLog(`✗ Failed message ${i + 1}: ${result.error || 'Unknown error'}`, 'error');
+                        }
+                    } catch (error) {
+                        addLog(`✗ Network error for message ${i + 1}: ${error.message}`, 'error');
+                    }
+                    
+                    // Wait before retry (if not successful and not last attempt)
+                    if (!success && attempts <= retryCount) {
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                    }
+                }
+                
+                if (!success) {
+                    failedCount++;
+                }
+                
+                // Update UI
                 updateProgress();
+                updateStats();
                 
-                // Delay between messages
+                // Delay between messages (except for last message)
                 if (i < messageList.length - 1 && !stopRequested) {
-                    addLog(`⏳ ${delay} सेकंड का डिले...`, 'info');
-                    await new Promise(resolve => setTimeout(resolve, delay * 1000));
+                    const delayText = document.getElementById('statusText').textContent + ` | Next in ${delay/1000}s`;
+                    document.getElementById('statusText').textContent = delayText;
+                    
+                    await new Promise(resolve => setTimeout(resolve, delay));
                 }
             }
             
-            isSending = false;
-            document.getElementById('sendBtn').style.display = 'block';
-            document.getElementById('stopBtn').style.display = 'none';
-            document.getElementById('status').textContent = stopRequested ? 'रोक दिया गया' : 'पूरा हो गया!';
-            
-            if (!stopRequested) {
-                addLog('🎉 सभी मैसेज सफलतापूर्वक भेजे गए!', 'success');
-            }
+            // Complete the process
+            completeSending();
         }
         
+        // Stop Sending
         function stopSending() {
             stopRequested = true;
-            addLog('⏸ रोकने का अनुरोध किया गया...', 'info');
+            isSending = false;
+            isPaused = false;
+            
+            document.getElementById('statusText').textContent = 'Stopped by user';
+            document.getElementById('statusIcon').className = 'fas fa-stop-circle';
+            
+            addLog('Message sending stopped', 'warning');
+            
+            // Update UI
+            document.getElementById('sendBtn').disabled = false;
+            document.getElementById('controlButtons').style.display = 'none';
         }
         
-        // Auto switch between file and single message
-        document.getElementById('sendMode').addEventListener('change', function(e) {
-            if (e.target.value === 'file') {
-                document.getElementById('singleMessage').style.opacity = '0.5';
-                document.getElementById('singleMessage').disabled = true;
+        // Pause/Resume Sending
+        function pauseSending() {
+            const pauseBtn = document.getElementById('pauseBtn');
+            
+            if (!isPaused) {
+                isPaused = true;
+                pauseBtn.innerHTML = '<i class="fas fa-play-circle"></i> Resume';
+                document.getElementById('statusText').textContent = 'Paused';
+                document.getElementById('statusIcon').className = 'fas fa-pause-circle';
+                addLog('Sending paused', 'warning');
             } else {
-                document.getElementById('singleMessage').style.opacity = '1';
-                document.getElementById('singleMessage').disabled = false;
+                isPaused = false;
+                pauseBtn.innerHTML = '<i class="fas fa-pause-circle"></i> Pause';
+                document.getElementById('statusIcon').className = 'fas fa-sync-alt fa-spin';
+                document.getElementById('statusText').textContent = 'Resuming...';
+                addLog('Sending resumed', 'info');
             }
-        });
+        }
+        
+        // Complete Sending
+        function completeSending() {
+            isSending = false;
+            
+            document.getElementById('sendBtn').disabled = false;
+            document.getElementById('controlButtons').style.display = 'none';
+            document.getElementById('statusIcon').className = 'fas fa-check-circle';
+            
+            if (stopRequested) {
+                document.getElementById('statusText').textContent = 'Stopped by user';
+            } else {
+                document.getElementById('statusText').textContent = 'All messages sent successfully!';
+                addLog(`Completed! Sent: ${sentCount}, Failed: ${failedCount}`, 'success');
+                
+                // Show completion summary
+                setTimeout(() => {
+                    alert(`Message sending completed!\n\nSuccessfully sent: ${sentCount}\nFailed: ${failedCount}\nSuccess rate: ${((sentCount/(sentCount+failedCount))*100).toFixed(1)}%`);
+                }, 500);
+            }
+            
+            // Clear job interval if exists
+            if (jobInterval) {
+                clearInterval(jobInterval);
+                jobInterval = null;
+            }
+        }
+        
+        // Update Progress
+        function updateProgress() {
+            const total = messages.length || 
+                         (document.getElementById('sendMode').value === 'single' ? 1 : 
+                         document.getElementById('batchMessages').value.split('\n').filter(l => l.trim()).length);
+            
+            const percent = total > 0 ? Math.round((currentIndex / total) * 100) : 0;
+            
+            document.getElementById('progressFill').style.width = `${percent}%`;
+            document.getElementById('progressPercent').textContent = `${percent}%`;
+            document.getElementById('sentCount').textContent = currentIndex;
+            document.getElementById('totalCount').textContent = total;
+        }
+        
+        // Update Statistics
+        function updateStats() {
+            const total = messages.length || 
+                         (document.getElementById('sendMode').value === 'single' ? 1 : 
+                         document.getElementById('batchMessages').value.split('\n').filter(l => l.trim()).length);
+            
+            const remaining = Math.max(0, total - currentIndex);
+            const successRate = sentCount + failedCount > 0 ? 
+                Math.round((sentCount / (sentCount + failedCount)) * 100) : 100;
+            
+            document.getElementById('statSent').textContent = sentCount;
+            document.getElementById('statFailed').textContent = failedCount;
+            document.getElementById('statRemaining').textContent = remaining;
+            document.getElementById('statSuccessRate').textContent = `${successRate}%`;
+        }
+        
+        // Update Message Stats
+        function updateSingleMessageStats() {
+            const message = document.getElementById('singleMessage').value;
+            const charCount = message.length;
+            const wordCount = message.trim().split(/\s+/).filter(w => w).length;
+            
+            // Update character count display
+            const label = document.querySelector('label[for="singleMessage"]');
+            label.innerHTML = `<i class="fas fa-edit"></i> Single Message (${charCount} chars, ${wordCount} words)`;
+        }
+        
+        function updateBatchMessageStats() {
+            const messages = document.getElementById('batchMessages').value;
+            const messageList = messages.split('\n').filter(line => line.trim());
+            const charCount = messages.length;
+            
+            document.getElementById('batchCount').textContent = 
+                `${messageList.length} messages, ${charCount} characters`;
+        }
+        
+        // Add Log
+        function addLog(message, level = 'info') {
+            const logsContent = document.getElementById('logsContent');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            const logItem = document.createElement('div');
+            logItem.className = `log-item ${level}`;
+            logItem.innerHTML = `
+                <span class="log-time">[${timestamp}]</span>
+                <span class="log-message">${message}</span>
+            `;
+            
+            logsContent.appendChild(logItem);
+            logsContent.scrollTop = logsContent.scrollHeight;
+            
+            // Keep only last 100 logs
+            const logs = logsContent.querySelectorAll('.log-item');
+            if (logs.length > 100) {
+                logs[0].remove();
+            }
+        }
+        
+        // Clear Logs
+        function clearLogs() {
+            document.getElementById('logsContent').innerHTML = '';
+            addLog('Logs cleared', 'info');
+        }
+        
+        // Server Health Check
+        async function checkServerHealth() {
+            const serverStatus = document.getElementById('serverStatus');
+            
+            serverStatus.className = 'token-status checking';
+            serverStatus.querySelector('.status-text').textContent = 'Checking...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const result = await response.json();
+                
+                if (result.status === 'healthy') {
+                    serverStatus.className = 'token-status valid';
+                    serverStatus.querySelector('.status-text').textContent = 'Online';
+                } else {
+                    serverStatus.className = 'token-status invalid';
+                    serverStatus.querySelector('.status-text').textContent = 'Unhealthy';
+                }
+            } catch (error) {
+                serverStatus.className = 'token-status invalid';
+                serverStatus.querySelector('.status-text').textContent = 'Offline';
+            }
+        }
+        
+        // Data Management
+        function saveSettings() {
+            const settings = {
+                token: document.getElementById('token').value,
+                userId: document.getElementById('userId').value,
+                sendMode: document.getElementById('sendMode').value,
+                singleMessage: document.getElementById('singleMessage').value,
+                batchMessages: document.getElementById('batchMessages').value,
+                delay: document.getElementById('delay').value,
+                retryCount: document.getElementById('retryCount').value,
+                apiBase: document.getElementById('apiBase').value,
+                apiVersion: document.getElementById('apiVersion').value
+            };
+            
+            localStorage.setItem('fbMessengerSettings', JSON.stringify(settings));
+            addLog('Settings saved automatically', 'info');
+        }
+        
+        function loadSettings() {
+            try {
+                const saved = localStorage.getItem('fbMessengerSettings');
+                if (saved) {
+                    const settings = JSON.parse(saved);
+                    
+                    document.getElementById('token').value = settings.token || '';
+                    document.getElementById('userId').value = settings.userId || '';
+                    document.getElementById('sendMode').value = settings.sendMode || 'file';
+                    document.getElementById('singleMessage').value = settings.singleMessage || '';
+                    document.getElementById('batchMessages').value = settings.batchMessages || '';
+                    document.getElementById('delay').value = settings.delay || '5';
+                    document.getElementById('retryCount').value = settings.retryCount || '3';
+                    document.getElementById('apiBase').value = settings.apiBase || `${window.location.origin}/api`;
+                    document.getElementById('apiVersion').value = settings.apiVersion || 'v19.0';
+                    
+                    // Update UI based on loaded settings
+                    toggleMessageSource();
+                    updateSingleMessageStats();
+                    updateBatchMessageStats();
+                    
+                    addLog('Settings loaded from storage', 'success');
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+        
+        function exportData() {
+            const settings = {
+                token: document.getElementById('token').value,
+                userId: document.getElementById('userId').value,
+                messages: messages,
+                timestamp: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(settings, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `fb-messenger-backup-${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            addLog('Settings exported successfully', 'success');
+        }
+        
+        function importData() {
+            document.getElementById('importFile').click();
+            
+            document.getElementById('importFile').onchange = function(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        
+                        if (data.token) document.getElementById('token').value = data.token;
+                        if (data.userId) document.getElementById('userId').value = data.userId;
+                        if (data.messages) {
+                            messages = data.messages;
+                            document.getElementById('fileStats').style.display = 'block';
+                            document.getElementById('messageCount').textContent = messages.length;
+                            addLog(`Imported ${messages.length} messages from backup`, 'success');
+                        }
+                        
+                        addLog('Settings imported successfully', 'success');
+                    } catch (error) {
+                        addLog('Error importing settings: Invalid file format', 'error');
+                    }
+                };
+                
+                reader.readAsText(file);
+                event.target.value = ''; // Reset file input
+            };
+        }
+        
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                localStorage.clear();
+                document.getElementById('token').value = '';
+                document.getElementById('userId').value = '';
+                document.getElementById('singleMessage').value = '';
+                document.getElementById('batchMessages').value = '';
+                document.getElementById('fileInput').value = '';
+                document.getElementById('fileName').textContent = 'Click to upload messages.txt file';
+                document.getElementById('fileStats').style.display = 'none';
+                messages = [];
+                clearLogs();
+                addLog('All data cleared', 'warning');
+            }
+        }
+        
+        // Modal Functions
+        function showAbout() {
+            alert(`Facebook Messenger Auto System v2.0\n\nDeveloped for bulk messaging with Facebook Graph API\nDeployed on Render for high availability\n\nFeatures:\n• Token-based authentication\n• File upload support\n• Batch messaging\n• Real-time progress tracking\n• Error handling and retries\n• Secure data storage`);
+        }
+        
+        function showHelp() {
+            alert(`Help & Support\n\n1. Getting Facebook Token:\n   - Go to developers.facebook.com\n   - Create an app\n   - Get token from Graph API Explorer\n\n2. Finding User ID:\n   - Use the "Find my User ID" button\n   - Or check Facebook profile URL\n\n3. Message Format:\n   - One message per line in .txt file\n   - Maximum 1000 messages per file\n   - Each message max 2000 characters\n\n4. Rate Limiting:\n   - Use 5-10 second delays\n   - Facebook limits: ~30 messages/minute\n\n5. Troubleshooting:\n   - Verify token is valid\n   - Check User ID is correct\n   - Ensure proper permissions\n\nFor more help, check the console logs.`);
+        }
+        
+        function showPrivacy() {
+            alert(`Privacy & Security Notice\n\n• All data is stored locally in your browser\n• Tokens are never sent to our servers\n• Messages are sent directly to Facebook API\n• No data is collected or stored externally\n• Clear browser data to remove all settings\n\nSecurity Tips:\n• Never share your Facebook token\n• Use this tool only for legitimate purposes\n• Comply with Facebook's Terms of Service\n• Delete token after use for security`);
+        }
         
         // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            addLog('सिस्टम तैयार है', 'info');
-        });
+        toggleMessageSource();
     </script>
 </body>
 </html>
