@@ -1,7 +1,8 @@
 """
 Facebook Messenger API Server for Render Deployment
 Author: Your Name
-Version: 1.0.0
+Version: 2.0.0
+Updated for Flask 2.3+ compatibility
 """
 
 from flask import Flask, request, jsonify, send_from_directory
@@ -10,13 +11,13 @@ import requests
 import os
 import time
 import uuid
-from threading import Thread
+import threading
 import logging
 from datetime import datetime
 import json
 
 # Initialize Flask app
-app = Flask(__name__, static_folder='static')
+app = Flask(__name__, static_folder='.')
 
 # Configure CORS
 CORS(app, resources={
@@ -35,7 +36,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# In-memory storage for jobs (for demo, use Redis in production)
+# In-memory storage for jobs
 active_jobs = {}
 completed_jobs = {}
 
@@ -48,7 +49,7 @@ class MessengerJob:
         self.user_id = user_id
         self.messages = messages
         self.delay = delay
-        self.status = "pending"  # pending, running, completed, stopped, error
+        self.status = "pending"
         self.progress = 0
         self.total = len(messages)
         self.logs = []
@@ -61,7 +62,7 @@ class MessengerJob:
         """Start the job in a separate thread"""
         self.status = "running"
         self.started_at = datetime.now().isoformat()
-        self.thread = Thread(target=self.run, daemon=True)
+        self.thread = threading.Thread(target=self.run, daemon=True)
         self.thread.start()
         logger.info(f"Job {self.job_id} started with {self.total} messages")
         
@@ -79,7 +80,7 @@ class MessengerJob:
                 success, log_msg = self.send_message(message)
                 self.add_log(log_msg, "info" if success else "error")
                 
-                # Add delay between messages (if not last message)
+                # Add delay between messages
                 if i < len(self.messages) - 1 and self.status == "running":
                     time.sleep(self.delay)
             
@@ -89,7 +90,7 @@ class MessengerJob:
                 self.completed_at = datetime.now().isoformat()
                 self.add_log("✅ All messages sent successfully!", "success")
                 
-                # Move to completed jobs after 1 hour cleanup
+                # Move to completed jobs
                 completed_jobs[self.job_id] = self
                 if self.job_id in active_jobs:
                     del active_jobs[self.job_id]
@@ -164,7 +165,7 @@ class MessengerJob:
             "progress": self.progress,
             "total": self.total,
             "percentage": round((self.progress / self.total * 100) if self.total > 0 else 0, 1),
-            "logs": self.logs[-20:],  # Last 20 logs
+            "logs": self.logs[-20:],
             "created_at": self.created_at,
             "started_at": self.started_at,
             "completed_at": self.completed_at
@@ -189,7 +190,7 @@ def health_check():
         "status": "healthy",
         "service": "Facebook Messenger API",
         "timestamp": datetime.now().isoformat(),
-        "version": "1.0.0",
+        "version": "2.0.0",
         "environment": os.environ.get('RENDER', 'development'),
         "active_jobs": len(active_jobs),
         "completed_jobs": len(completed_jobs)
@@ -389,7 +390,7 @@ def parse_message_file():
             "success": True,
             "filename": file.filename,
             "total_lines": len(messages),
-            "messages": messages[:1000],  # Limit to 1000 messages
+            "messages": messages[:1000],
             "message": f"Parsed {len(messages)} messages successfully"
         })
         
@@ -397,7 +398,7 @@ def parse_message_file():
         logger.error(f"File parse error: {e}")
         return jsonify({"error": str(e)}), 500
 
-# Cleanup old jobs (runs periodically)
+# Cleanup old jobs
 def cleanup_old_jobs():
     """Remove old completed jobs"""
     current_time = datetime.now()
@@ -413,11 +414,9 @@ def cleanup_old_jobs():
         del completed_jobs[job_id]
         logger.info(f"Cleaned up old job: {job_id}")
 
-# Schedule cleanup (simple in-memory scheduler)
+# Schedule cleanup
 def schedule_cleanup():
     """Schedule periodic cleanup"""
-    import threading
-    
     def cleanup_task():
         while True:
             time.sleep(300)  # Run every 5 minutes
@@ -425,13 +424,6 @@ def schedule_cleanup():
     
     thread = threading.Thread(target=cleanup_task, daemon=True)
     thread.start()
-
-# Application startup
-@app.before_first_request
-def startup():
-    """Initialize application on first request"""
-    schedule_cleanup()
-    logger.info("Facebook Messenger API started successfully")
 
 # Error handlers
 @app.errorhandler(404)
@@ -446,6 +438,10 @@ def internal_error(error):
 @app.errorhandler(413)
 def too_large(error):
     return jsonify({"error": "File too large. Maximum size is 16MB"}), 413
+
+# Initialize cleanup on startup
+schedule_cleanup()
+logger.info("Facebook Messenger API started successfully")
 
 # Main entry point
 if __name__ == '__main__':
